@@ -1,0 +1,25 @@
+resources:
+  jobs:
+    template:
+      name: template
+      tasks:
+        - task_key: extract_mobills
+          notebook_task:
+            notebook_path: ../src/extract/extract_mobills.ipynb
+            source: WORKSPACE
+        - task_key: pipeline
+          depends_on:
+            - task_key: extract_mobills
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.pl_mobills.id}
+        - task_key: grants
+          depends_on:
+            - task_key: pipeline
+          notebook_task:
+            notebook_path: ../src/post_deploy/post_deploy.ipynb
+            source: WORKSPACE
+      queue:
+        enabled: true
+      parameters:
+        - name: parameters
+          default: ""
