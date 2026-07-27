@@ -34,7 +34,6 @@ jobs:
         run: |
           databricks auth profiles 
           databricks current-user me --profile PROD
-          databricks workspace ls / --profile PROD
 
       - name: Validate bundle
         run: databricks bundle validate --target prod --profile PROD
