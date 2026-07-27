@@ -4,7 +4,7 @@ resources:
       name: MOBILLS_ETL
       libraries:
         - glob:
-            include: ../src/mobills_etl/1-bronze/**
+            include: ../src/mobills_etl/**
       catalog: "${var.catalog}"
       channel: CURRENT
       continuous: false
