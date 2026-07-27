@@ -27,8 +27,14 @@ jobs:
           [PROD]
           host = https://dbc-bd83e171-6ecf.cloud.databricks.com
           client_id = ${{ secrets.CLIENT_ID }}
-          secret = $${{ secrets.SECRET }}
+          client_secret = ${{ secrets.SECRET }}
           EOF
+
+      - name: Test Authentication
+        run: |
+          databricks auth profiles 
+          databricks current-user me --profile PROD
+          databricks workspace ls / --profile PROD
 
       - name: Validate bundle
         run: databricks bundle validate --target prod --profile PROD
