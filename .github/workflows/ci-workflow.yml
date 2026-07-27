@@ -1,0 +1,34 @@
+name: CI Workflow
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  ci-validate:
+    name: Validate Bundles
+    runs-on: ubuntu-latest
+    environment: PROD
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+      
+      - name: Setup Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.11'
+
+      - name: Install Databricks CLI
+        run: curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
+
+      - name: Configure Databricks
+        run: |
+          cat <<EOF> ~/.databrickscfg
+          [PROD]
+          host = https://dbc-bd83e171-6ecf.cloud.databricks.com
+          client_id = ${{ secrets.CLIENT_ID }}
+          client_secret = ${{ secrets.SECRET }}
+          EOF
+
+      - name: Validate bundle
+        run: databricks bundle validate --target prod --profile PROD
