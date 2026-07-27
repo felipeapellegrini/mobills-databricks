@@ -1,7 +1,7 @@
 resources:
   jobs:
-    template:
-      name: template
+    etl_mobills:
+      name: ETL Mobills - Full Process
       tasks:
         - task_key: extract_mobills
           notebook_task:
