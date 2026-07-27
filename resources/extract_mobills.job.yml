@@ -233,6 +233,18 @@ resources:
           run_if: ALL_SUCCESS
           timeout_seconds: 0
           webhook_notifications: {}
+        - task_key: gold_mth_income_share
+          depends_on:
+            - task_key: gold_transacoes
+            - task_key: gold_calendar
+          disabled: false
+          email_notifications: {}
+          notebook_task:
+            notebook_path: ../src/z4_dashboard/gold_mth_income_share.ipynb
+            source: WORKSPACE
+          run_if: ALL_SUCCESS
+          timeout_seconds: 0
+          webhook_notifications: {}
         - task_key: purge_source
           depends_on:
             - task_key: gold_transacoes
