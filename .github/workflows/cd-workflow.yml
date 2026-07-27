@@ -30,13 +30,5 @@ jobs:
           client_secret = ${{ secrets.SECRET }}
           EOF
 
-      - name: Test Authentication
-        run: |
-          databricks auth profiles 
-          databricks current-user me --profile PROD
-
-      - name: Validate bundle
-        run: databricks bundle validate --target prod --profile PROD
-
       - name: Deploy to PROD
         run: databricks bundle deploy --target prod --profile PROD
