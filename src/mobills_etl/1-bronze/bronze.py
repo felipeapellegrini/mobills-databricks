@@ -65,10 +65,9 @@ def make_bronze(src):
             .option("cloudFiles.inferSchema", "true")
             .option("cloudFiles.inferColumnTypes", "true")
             .option("cloudFiles.format", file_type)
-            .option("header", "true")
-            .option("cloudFiles.schemaLocation", f"/Volumes/mobills_etl/bronze/schemas/{table_name}_schema/")
             .option("cloudFiles.schemaEvolutionMode", schema_evolution_policy)
-            .load(f"/Volumes/mobills_etl/default/raw_data/{table_name}")
+            .option("header", "true")
+            .load(f"/Volumes/mobills/default/raw_data/{table_name}")
             .withColumn("_processdate", lit(_DTLOAD))
             .withColumn(
                 "_businessdate", date_format(col(businessdate_col), "yyyyMMdd") if businessdate_col else lit(_DTLOAD)
