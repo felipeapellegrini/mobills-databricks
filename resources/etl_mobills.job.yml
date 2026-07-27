@@ -6,6 +6,8 @@ resources:
         - task_key: extract_mobills
           notebook_task:
             notebook_path: ../src/extract/extract_mobills.ipynb
+            base_parameters:
+              payload: "{{job.parameters.hash}}"
             source: WORKSPACE
         - task_key: pipeline
           depends_on:
@@ -21,5 +23,5 @@ resources:
       queue:
         enabled: true
       parameters:
-        - name: parameters
+        - name: hash
           default: ""
