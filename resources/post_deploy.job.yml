@@ -1,0 +1,11 @@
+resources:
+  jobs:
+    grant_permissions::
+      name: Grant Permissions
+      tasks:
+        - task_key: grants
+          notebook_task:
+            notebook_path: ../src/post_deploy/post_deploy.ipynb
+      queue:
+        enabled: true
+      performance_target: PERFORMANCE_OPTIMIZED
