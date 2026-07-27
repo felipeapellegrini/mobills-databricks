@@ -1,5 +1,5 @@
 from pyspark import pipelines as dp
-from pyspark.sql.functions import *
+from pyspark.sql.functions import lit, col, date_format, current_timestamp
 from datetime import datetime
 
 SOURCES = [
