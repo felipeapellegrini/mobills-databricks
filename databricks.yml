@@ -27,7 +27,7 @@ targets:
     workspace:
       host: https://dbc-bd83e171-6ecf.cloud.databricks.com
     variables:
-      catalog: mobills_etl
+      catalog: mobills
       schema: ${workspace.current_user.short_name}
       flag_dev: true
   prod:
