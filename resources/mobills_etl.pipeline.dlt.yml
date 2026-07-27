@@ -1,0 +1,15 @@
+resources:
+  pipelines:
+    pl_mobills:
+      name: MOBILLS_ETL
+      libraries:
+        - glob:
+            include: ../src/mobills_etl/1-bronze/**
+      catalog: "${var.catalog}"
+      channel: CURRENT
+      continuous: false
+      photon: true
+      root_path: ../src/mobills_etl
+      schema: bronze
+      serverless: true
+      development: "${var.flag_dev}"
