@@ -56,7 +56,7 @@ def make_bronze(src):
     schema_evolution_policy = src["schema_evolution_policy"]
 
     @dp.table(
-        name=f"mobills_etl.bronze.{table_name}",
+        name=f"bronze.{table_name}",
         comment="Bronze ingestion with SDP from Mobills extraction CSV via Auto Loader",
     )
     def bronze_table():

@@ -15,8 +15,8 @@ def make_silver(slv):
     table_name = slv["table_name"]
     natural_keys = slv["natural_keys"]
 
-    src_table = f"mobills_etl.bronze.{table_name}"
-    tgt_table = f"mobills_etl.silver.{table_name}"
+    src_table = f"bronze.{table_name}"
+    tgt_table = f"silver.{table_name}"
 
     dp.create_streaming_table(
         name=tgt_table, comment=f"Silver {table_name} - deduplicated by {natural_keys} SCD type 1"
