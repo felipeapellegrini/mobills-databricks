@@ -7,10 +7,10 @@ _ORCAMENTOS = "gold.orcamentos"
 _CALENDAR = "gold.calendar"
 
 _SOURCE = "_src_cashflow"
-_TARGET = "gold.monthly_cashflow"
+_TARGET = "analytics.monthly_cashflow"
 
 
-@dp.materialized_view(name=_SOURCE)
+@dp.materialized_view(name=_SOURCE, private=True)
 def _source():
     trs = (
         spark.read.table(_TRANSACOES)
