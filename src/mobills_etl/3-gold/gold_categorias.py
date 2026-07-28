@@ -12,7 +12,7 @@ _ESTILO_DE_VIDA = ["Habitação", "Saúde", "Educação", "Transporte", "Outros 
 @dp.materialized_view(name=_SNAPSHOT, private=True)
 def _source():
     df_gold = (
-        spark.readStream.table(_SILVER)
+        spark.read.table(_SILVER)
         .withColumn(
             "agrupador",
             when(col("categoriaPai") == "Rendimentos", lit("Rendimentos"))
