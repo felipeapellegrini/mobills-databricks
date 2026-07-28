@@ -9,7 +9,7 @@ _GOLD = "gold.categorias"
 _ESTILO_DE_VIDA = ["Habitação", "Saúde", "Educação", "Transporte", "Outros Fixos"]
 
 
-@dp.temporary_view(name=_SOURCE)
+@dp.materialized_view(name=_SNAPSHOT, private=True)
 def _source():
     df_gold = (
         spark.readStream.table(_SILVER)
@@ -33,4 +33,6 @@ def _source():
 
 dp.create_streaming_table(name=_GOLD)
 
-dp.create_auto_cdc_flow(target=_GOLD, source=_SOURCE, keys=["id"], sequence_by="_ingesttime", stored_as_scd_type=1)
+dp.create_auto_cdc_from_snapshot_flow(
+    target=_GOLD, source=_SOURCE, keys=["id"], sequence_by="_ingesttime", stored_as_scd_type=1
+)
