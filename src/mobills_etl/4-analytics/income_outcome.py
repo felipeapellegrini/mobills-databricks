@@ -16,6 +16,8 @@ def _source():
         .agg(sum(col("valor_abs")).alias("valor_abs"))
         .withColumn("despesas", when(col("natureza") == "Despesas", col("valor_abs")).otherwise(lit(0)))
         .withColumn("receitas", when(col("natureza") == "Receitas", col("valor_abs")).otherwise(lit(0)))
+        .groupBy("ano_mes")
+        .agg(sum("despesas").alias("despesas"), sum("receitas").alias("receitas"))
         .select("ano_mes", "despesas", "receitas")
     )
 
