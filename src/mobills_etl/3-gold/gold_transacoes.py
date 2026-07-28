@@ -4,7 +4,7 @@ from pyspark.sql.functions import regexp_extract, col, nullif, lit, date_format
 
 _CONTAS = "silver.contas"
 _CARTOES = "silver.cartoes"
-_CATEGORIAS = "silver.categorias"
+_CATEGORIAS = "gold.categorias"
 _TRANSACOES = "silver.transacoes"
 
 _SNAPSHOT = "_gold_transacoes"
@@ -39,8 +39,9 @@ def _snapshot():
             col("ct.nome").alias("conta"),
             col("crt.nome").alias("cartao"),
             "cat.natureza",
-            col("cat.categoriaPai").alias("categoria"),
-            col("cat.categoria").alias("subcategoria"),
+            "cat.categoria",
+            "cat.subcategoria",
+            "cat.agrupador",
             "trs.valor",
             "trs.valor_abs",
             "parcela_atual",
