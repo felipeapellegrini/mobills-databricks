@@ -4,7 +4,7 @@ from pyspark.sql.functions import col, sum
 _TRANSACOES = "gold.transacoes"
 _SNAPSHOT = "_src_income_outcome"
 
-_ANALYTICS = "gold.income_vs_outcome"
+_ANALYTICS = "analytics.income_vs_outcome"
 
 
 @dp.materialized_view(name=_SNAPSHOT, private=True)
