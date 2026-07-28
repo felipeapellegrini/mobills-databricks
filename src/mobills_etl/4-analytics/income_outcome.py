@@ -11,7 +11,7 @@ _ANALYTICS = "gold.income_vs_outcome"
 def _source():
     return (
         spark.read.table(_TRANSACOES)
-        .filter(col("ano_mes") >= "2026-01-01")
+        .filter((col("ano_mes") >= "2026-01-01") & (col("natureza").isin(["Despesas", "Receitas"])))
         .groupBy(["ano_mes", "natureza"])
         .agg(sum(col("valor_abs")).alias("valor_abs"))
         .orderBy("ano_mes", "natureza")
