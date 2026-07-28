@@ -2,7 +2,7 @@ from pyspark import pipelines as dp
 from pyspark.sql.functions import col, when, lit
 
 
-_SOURCE = "_src_gold_categorias"
+_SNAPSHOT = "_src_gold_categorias"
 _SILVER = "silver.categorias"
 _GOLD = "gold.categorias"
 
@@ -34,5 +34,5 @@ def _source():
 dp.create_streaming_table(name=_GOLD)
 
 dp.create_auto_cdc_from_snapshot_flow(
-    target=_GOLD, source=_SOURCE, keys=["id"], sequence_by="_ingesttime", stored_as_scd_type=1
+    target=_GOLD, source=_SNAPSHOT, keys=["id"], sequence_by="_ingesttime", stored_as_scd_type=1
 )
