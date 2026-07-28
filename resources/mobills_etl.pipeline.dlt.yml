@@ -1,7 +1,7 @@
 resources:
   pipelines:
     pl_mobills:
-      name: MOBILLS_ETL
+      name: Pipeline ETL Mobills
       libraries:
         - glob:
             include: ../src/mobills_etl/**

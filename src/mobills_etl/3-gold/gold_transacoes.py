@@ -1,5 +1,5 @@
 from pyspark import pipelines as dp
-from pyspark.sql.functions import regexp_extract, col, nullif, lit
+from pyspark.sql.functions import regexp_extract, col, nullif, lit, date_format
 
 
 _CONTAS = "silver.contas"
@@ -28,6 +28,7 @@ def _snapshot():
         .withColumn("parcela_atual", nullif(regexp_extract("trs.descricao", _REGEX, 1), lit("")).cast("int"))
         .withColumn("total_parcelas", nullif(regexp_extract("trs.descricao", _REGEX, 2), lit("")).cast("int"))
         .withColumn("futuro_vendido", (col("total_parcelas") - col("parcela_atual")) * col("valor_abs"))
+        .withColumn("ano_mes", date_format(col("trs.data"), "yyyy-MM-01"))
         .select(
             "trs.unique_id",
             col("trs.id").alias("id"),
@@ -45,6 +46,7 @@ def _snapshot():
             "parcela_atual",
             "total_parcelas",
             "futuro_vendido",
+            "ano_mes",
         )
     )
 
