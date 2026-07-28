@@ -6,7 +6,7 @@ _SNAPSHOT = "_src_gold_categorias"
 _SILVER = "silver.categorias"
 _GOLD = "gold.categorias"
 
-_ESTILO_DE_VIDA = ["Habitação", "Saúde", "Educação", "Transporte", "Outros Fixos"]
+_ESTILO_DE_VIDA = ["Habitação", "Saúde", "Educação", "Transporte", "Outros fixos"]
 
 
 @dp.materialized_view(name=_SNAPSHOT, private=True)
