@@ -14,6 +14,7 @@ resources:
             - task_key: extract_mobills
           pipeline_task:
             pipeline_id: ${resources.pipelines.pl_mobills.id}
+          max_retries: 2
         - task_key: grants
           depends_on:
             - task_key: pipeline
