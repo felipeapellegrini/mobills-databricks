@@ -13,6 +13,7 @@ _ESTILO_DE_VIDA = ["Habitação", "Saúde", "Educação", "Transporte", "Outros 
 def _source():
     df_gold = (
         spark.read.table(_SILVER)
+        .filter(col("categoriaPai").isNotNull())
         .withColumn(
             "agrupador",
             when(col("categoriaPai") == "Rendimentos", lit("Rendimentos"))
