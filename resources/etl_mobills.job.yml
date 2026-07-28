@@ -8,7 +8,6 @@ resources:
             notebook_path: ../src/extract/extract_mobills.ipynb
             base_parameters:
               payload: "{{job.parameters.hash}}"
-            source: WORKSPACE
         - task_key: pipeline
           depends_on:
             - task_key: extract_mobills
@@ -20,7 +19,11 @@ resources:
             - task_key: pipeline
           notebook_task:
             notebook_path: ../src/post_deploy/post_deploy.ipynb
-            source: WORKSPACE
+        - task_key: purge_csvs
+          depends_on:
+            - task_key: pipeline
+          notebook_task:
+            notebook_path: ../src/purge_csv/purge.ipynb
       queue:
         enabled: true
       parameters:
