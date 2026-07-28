@@ -1,7 +1,7 @@
 resources:
   jobs:
     etl_mobills:
-      name: ETL Mobills - Full Process
+      name: Orchestrator Mobills
       tasks:
         - task_key: extract_mobills
           notebook_task:
