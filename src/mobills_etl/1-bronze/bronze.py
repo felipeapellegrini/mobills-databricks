@@ -37,7 +37,15 @@ SOURCES = [
     },
     {
         "src": {
-            "table_name": "transacoes",
+            "table_name": "transacoes_pendentes",
+            "businessdate_col": "data",
+            "file_type": "csv",
+            "schema_evolution_policy": "addNewColumns",
+        }
+    },
+    {
+        "src": {
+            "table_name": "transacoes_efetivadas",
             "businessdate_col": "data",
             "file_type": "csv",
             "schema_evolution_policy": "addNewColumns",
@@ -71,6 +79,12 @@ def make_bronze(src):
             .withColumn("_processdate", lit(_DTLOAD))
             .withColumn(
                 "_businessdate", date_format(col(businessdate_col), "yyyyMMdd") if businessdate_col else lit(_DTLOAD)
+            )
+            .withColumn(
+                "_businessmonth",
+                date_format(col(businessdate_col), "yyyyMM01")
+                if businessdate_col
+                else date_format(lit(_DTLOAD), "yyyyMM01"),
             )
             .withColumn("_ingesttime", current_timestamp())
             .withColumn("_sourcefile", col("_metadata.file_path"))
