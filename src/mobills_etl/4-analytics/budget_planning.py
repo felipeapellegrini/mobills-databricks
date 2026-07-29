@@ -30,19 +30,7 @@ def _source():
         spark.read.table(_TRANSACOES)
         .groupBy(["ano_mes", "agrupador", "categoria", "subcategoria"])
         .agg(sum("valor_abs").alias("valor"))
-        .withColumn("media_3_meses", sum("valor").over(w_trs_avg_3m) / 3)
-        .withColumn("media_6_meses", sum("valor").over(w_trs_avg_6m) / 6)
-        .withColumn("valor_mes_anterior", lag("valor").over(w_trs_lag_1m))
-        .select(
-            "ano_mes",
-            "agrupador",
-            "categoria",
-            "subcategoria",
-            col("valor").alias("valor_mes_atual"),
-            coalesce("valor_mes_anterior", lit(0)).alias("valor_mes_anterior"),
-            coalesce("media_3_meses", lit(0)).alias("media_3_meses"),
-            coalesce("media_6_meses", lit(0)).alias("media_6_meses"),
-        )
+        .select("ano_mes", "agrupador", "categoria", "subcategoria", col("valor").alias("valor_transacao"))
     )
 
     orc = spark.read.table(_ORCAMENTOS).select(
@@ -60,12 +48,15 @@ def _source():
         .orderBy("ano_mes", "agrupador", "categoria", "subcategoria")
         .join(trs, on=["ano_mes", "agrupador", "categoria", "subcategoria"], how="left")
         .join(orc, on=["ano_mes", "categoria", "subcategoria"], how="left")
+        .withColumn("media_3_meses", sum("valor_transacao").over(w_trs_avg_3m) / 3)
+        .withColumn("media_6_meses", sum("valor_transacao").over(w_trs_avg_6m) / 6)
+        .withColumn("valor_mes_anterior", lag("valor_transacao").over(w_trs_lag_1m))
         .select(
             "ano_mes",
             "agrupador",
             "categoria",
             "subcategoria",
-            coalesce("valor_mes_atual", lit(0)).alias("valor_mes_atual"),
+            coalesce("valor_transacao", lit(0)).alias("valor_mes_atual"),
             coalesce("valor_mes_anterior", lit(0)).alias("valor_mes_anterior"),
             coalesce("media_3_meses", lit(0)).alias("media_3_meses"),
             coalesce("media_6_meses", lit(0)).alias("media_6_meses"),
