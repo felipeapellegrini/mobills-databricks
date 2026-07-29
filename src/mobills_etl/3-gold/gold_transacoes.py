@@ -5,20 +5,23 @@ from pyspark.sql.functions import regexp_extract, col, nullif, lit, date_format
 _CONTAS = "silver.contas"
 _CARTOES = "silver.cartoes"
 _CATEGORIAS = "gold.categorias"
-_TRANSACOES = "silver.transacoes"
+_TRANSACOES_PENDENTES = "silver.transacoes_pendentes"
+_TRANSACOES_EFETIVADAS = "silver.transacoes_efetivadas"
 
-_SNAPSHOT = "_gold_transacoes"
 _GOLD = "gold.transacoes"
 
 _REGEX = r"\((\d+)/(\d+)\)"
 
 
-@dp.materialized_view(name=_SNAPSHOT, private=True)
+@dp.materialized_view(name=_GOLD)
 def _snapshot():
     contas = spark.read.table(_CONTAS)
     cartoes = spark.read.table(_CARTOES)
     categorias = spark.read.table(_CATEGORIAS)
-    transacoes = spark.read.table(_TRANSACOES)
+    trs_pen = spark.read.table(_TRANSACOES_PENDENTES)
+    trs_efe = spark.read.table(_TRANSACOES_EFETIVADAS)
+
+    transacoes = trs_efe.unionByName(trs_pen)
 
     trs_gold = (
         transacoes.alias("trs")
@@ -52,10 +55,3 @@ def _snapshot():
     )
 
     return trs_gold
-
-
-dp.create_streaming_table(_GOLD)
-
-dp.create_auto_cdc_from_snapshot_flow(
-    target=_GOLD, source=_SNAPSHOT, keys=["id", "data_transacao", "conta"], stored_as_scd_type=1
-)
