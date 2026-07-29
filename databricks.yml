@@ -26,6 +26,7 @@ targets:
     default: true
     workspace:
       host: https://dbc-bd83e171-6ecf.cloud.databricks.com
+      root_path: /Workspace/Users/felipeapellegrini@gmail.com/.bundle/${bundle.name}/${bundle.target}
     variables:
       catalog: mobills_etl
       schema: ${workspace.current_user.short_name}
