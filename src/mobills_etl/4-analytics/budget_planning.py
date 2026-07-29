@@ -1,6 +1,6 @@
 from pyspark import pipelines as dp
 from pyspark.sql.functions import col, lit, coalesce, sum, lag
-
+from pyspark.sql.window import Window
 
 _TRANSACOES = "gold.transacoes"
 _ORCAMENTOS = "gold.orcamentos"
