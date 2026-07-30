@@ -5,6 +5,7 @@ from pyspark.sql.functions import col, when, sum
 _TRANSACOES = "gold.transacoes"
 _ORCAMENTO = "gold.orcamentos"
 _CALENDARIO = "gold.calendar"
+_CATEGORIAS = "gold.categorias"
 
 _SNAPSHOT = "_src_main_kpis"
 _ANALYTICS = "analytics.main_kpis"
@@ -13,6 +14,7 @@ _ANALYTICS = "analytics.main_kpis"
 @dp.materialized_view(name=_SNAPSHOT, private=True)
 def _source():
     cal = spark.table(_CALENDARIO).select("ano_mes").distinct()
+    cat = spark.read.table(_CATEGORIAS)
 
     trs = (
         spark.read.table(_TRANSACOES)
@@ -29,13 +31,26 @@ def _source():
         .withColumn("prc_parcelas", col("parcelas_mes_atual") / col("total_salario"))
     )
 
-    orc = spark.read.table(_ORCAMENTO).groupBy("data_orcamento").agg(sum("saldo").alias("total_orcamento"))
+    orc = (
+        spark.read.table(_ORCAMENTO)
+        .join(cat, ["categoria", "subcategoria"], "inner")
+        .groupBy("data_orcamento", "agrupador")
+        .agg(
+            sum(when(col("agrupador") == "Estilo de Vida", col("saldo"))).alias("orcado_estilo_vida"),
+            (sum("saldo").alias("total_orcamento")),
+        )
+        .groupBy("data_orcamento")
+        .agg(sum("orcado_estilo_vida").alias("orcado_estilo_vida"), sum("total_orcamento").alias("total_orcamento"))
+    )
 
     main_kpi = (
         cal.alias("cal")
         .join(trs.alias("trs"), cal.ano_mes == trs.ano_mes, "left")
         .join(orc.alias("orc"), cal.ano_mes == orc.data_orcamento, "left")
         .withColumn("performance_mes", trs.total_receitas - trs.total_despesas - orc.total_orcamento)
+        .withColumn(
+            "prc_prj_estilo_vida", (col("total_estilo_de_vida") + col("orcado_estilo_vida")) / col("total_salario")
+        )
         .select(
             cal.ano_mes,
             trs.total_salario,
@@ -46,6 +61,7 @@ def _source():
             trs.prc_parcelas,
             orc.total_orcamento,
             "performance_mes",
+            "prc_prj_estilo_vida",
         )
     )
 
