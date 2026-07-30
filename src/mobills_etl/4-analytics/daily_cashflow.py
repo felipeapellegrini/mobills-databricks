@@ -1,5 +1,5 @@
 from pyspark import pipelines as dp
-from pyspark.sql.functions import col, sum, coalesce, lit
+from pyspark.sql.functions import col, sum, coalesce, lit, when, abs
 from pyspark.sql.window import Window
 
 
@@ -43,6 +43,9 @@ def _source():
         )
         .withColumn("total_dia", col("total_transacoes") - col("total_orcamento"))
         .withColumn("fluxo_de_caixa", sum("total_dia").over(window))
+        .withColumn(
+            "juros_projetado", when(col("fluxo_de_caixa") < 0, abs(col("fluxo_de_caixa")) * 0.0035).otherwise(lit(0))
+        )
     )
     return cashflow
 
