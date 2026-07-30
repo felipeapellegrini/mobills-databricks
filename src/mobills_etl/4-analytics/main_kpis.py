@@ -1,0 +1,56 @@
+from pyspark import pipelines as dp
+from pyspark.sql.functions import col, when, sum
+
+
+_TRANSACOES = "gold.transacoes"
+_ORCAMENTO = "gold.orcamentos"
+_CALENDARIO = "gold.calendar"
+
+_SNAPSHOT = "_src_main_kpis"
+_ANALYTICS = "analytics.main_kpis"
+
+
+@dp.materialized_view(name=_SNAPSHOT, private=True)
+def _source():
+    cal = spark.table(_CALENDARIO).select("ano_mes").distinct()
+
+    trs = (
+        spark.read.table(_TRANSACOES)
+        .groupBy("ano_mes")
+        .agg(
+            sum(when(col("subcategoria") == "Salario", col("valor_abs"))).alias("total_salario"),
+            sum(when(col("subcategoria") == "Parcelados", col("valor_abs"))).alias("parcelas_mes_atual"),
+            sum(when(col("subcategoria") == "Parcelados", col("futuro_vendido"))).alias("total_parcelas"),
+            sum(when(col("agrupador") == "Estilo de Vida", col("valor_abs"))).alias("total_estilo_de_vida"),
+            sum(when(col("natureza") == "Receitas", col("valor_abs"))).alias("total_receitas"),
+            sum(when(col("natureza") == "Despesas", col("valor_abs"))).alias("total_despesas"),
+        )
+        .withColumn("prc_estilo_de_vida", col("total_estilo_de_vida") / col("total_salario"))
+        .withColumn("prc_parcelas", col("parcelas_mes_atual") / col("total_salario"))
+    )
+
+    orc = spark.read.table(_ORCAMENTO).groupBy("data_orcamento").agg(sum("saldo").alias("total_orcamento"))
+
+    main_kpi = (
+        cal.alias("cal")
+        .join(trs.alias("trs"), cal.ano_mes == trs.ano_mes, "left")
+        .join(orc.alias("orc"), cal.ano_mes == orc.data_orcamento, "left")
+        .withColumn("performance_mes", trs.total_receitas - trs.total_despesas - orc.total_orcamento)
+        .select(
+            cal.ano_mes,
+            trs.total_salario,
+            trs.total_parcelas,
+            trs.total_receitas,
+            trs.total_despesas,
+            trs.prc_estilo_de_vida,
+            trs.prc_parcelas,
+            orc.total_orcamento,
+            "performance_mes",
+        )
+    )
+
+    return main_kpi
+
+
+dp.create_streaming_table(name=_ANALYTICS)
+dp.create_auto_cdc_from_snapshot_flow(source=_SNAPSHOT, target=_ANALYTICS, keys=["ano_mes"], stored_as_scd_type=1)
