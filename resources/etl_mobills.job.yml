@@ -8,6 +8,7 @@ resources:
             notebook_path: ../src/extract/extract_mobills.ipynb
             base_parameters:
               payload: "{{job.parameters.hash}}"
+              reference_date: "{{job.parameters.refdate}}"
         - task_key: pipeline
           depends_on:
             - task_key: extract_mobills
@@ -28,4 +29,6 @@ resources:
         enabled: true
       parameters:
         - name: hash
+          default: ""
+        - name: refdate
           default: ""
