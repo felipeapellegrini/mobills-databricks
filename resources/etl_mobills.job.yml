@@ -9,6 +9,7 @@ resources:
             base_parameters:
               payload: "{{job.parameters.hash}}"
               refdate: "{{job.parameters.refdate}}"
+              budget: "{{jobs.parameters.budget}}"
         - task_key: pipeline
           depends_on:
             - task_key: extract_mobills
@@ -32,3 +33,5 @@ resources:
           default: ""
         - name: refdate
           default: ""
+        - name: budget
+          default: "true"
