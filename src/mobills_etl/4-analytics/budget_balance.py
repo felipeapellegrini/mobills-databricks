@@ -1,6 +1,7 @@
 from pyspark import pipelines as dp
 from pyspark.sql.window import Window
-from pyspark.sql.functions import col, lit, greatest, sum
+from pyspark.sql.functions import col, lit, greatest, sum, when, to_date
+from datetime import datetime
 
 
 _ORCAMENTOS = "gold.orcamentos"
@@ -9,6 +10,8 @@ _CATEGORIAS = "gold.categorias"
 _SNAPSHOT = "_src_budget_balance"
 
 _ANALYTICS = "analytics.budget_balance"
+
+_CUTOFF_DATE = datetime.now().strftime("%Y-%m-01")
 
 
 @dp.materialized_view(name=_SNAPSHOT, private=True)
@@ -25,7 +28,6 @@ def _source():
             "subcategoria",
             col("planejado").alias("orcado_subcategoria"),
             col("consumido").alias("real_subcategoria"),
-            "saldo",
         )
         .withColumn(
             "orcado_agrupador", sum("orcado_subcategoria").over(Window.partitionBy(["data_orcamento", "agrupador"]))
@@ -39,7 +41,12 @@ def _source():
         .withColumn(
             "real_categoria", sum("real_subcategoria").over(Window.partitionBy(["data_orcamento", "categoria"]))
         )
-        .withColumn("saldo_orcamento", greatest(lit(0), col("orcado_subcategoria") - col("real_subcategoria")))
+        .withColumn(
+            "saldo_orcamento",
+            when(col("data_orcamento") < to_date(lit(_CUTOFF_DATE)), 0).otherwise(
+                greatest(lit(0), col("orcado_subcategoria") - col("real_subcategoria"))
+            ),
+        )
         .select(
             "data_orcamento",
             "agrupador",
