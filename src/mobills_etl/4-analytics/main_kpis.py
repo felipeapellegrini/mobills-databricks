@@ -41,7 +41,11 @@ def _source():
             sum(when(col("subcategoria") == "Dividas caras", col("saldo"))).alias("orcado_juros"),
         )
         .groupBy("data_orcamento")
-        .agg(sum("orcado_estilo_vida").alias("orcado_estilo_vida"), sum("total_orcamento").alias("total_orcamento"))
+        .agg(
+            sum("orcado_estilo_vida").alias("orcado_estilo_vida"),
+            sum("total_orcamento").alias("total_orcamento"),
+            sum("orcado_juros").alias("orcado_juros"),
+        )
     )
 
     main_kpi = (
