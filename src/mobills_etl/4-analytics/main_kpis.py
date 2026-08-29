@@ -26,6 +26,7 @@ def _source():
             sum(when(col("agrupador") == "Estilo de Vida", col("valor_abs"))).alias("total_estilo_de_vida"),
             sum(when(col("natureza") == "Receitas", col("valor_abs"))).alias("total_receitas"),
             sum(when(col("natureza") == "Despesas", col("valor_abs"))).alias("total_despesas"),
+            sum(when(col("subcategoria") == "Dividas Caras", col("valor_abs"))).alias("total_sangramento"),
         )
         .withColumn("prc_estilo_de_vida", col("total_estilo_de_vida") / col("total_salario"))
         .withColumn("prc_parcelas", col("parcelas_mes_atual") / col("total_salario"))
@@ -57,6 +58,10 @@ def _source():
             "prc_prj_estilo_vida",
             (col("total_estilo_de_vida") + coalesce(col("orcado_estilo_vida"), lit(0))) / col("total_salario"),
         )
+        .withColumn(
+            "prc_sangramento",
+            (coalesce(col("total_sangramento"), lit(0)) + coalesce(col("orcado_juros"), lit(0))) / col("total_salario"),
+        )
         .select(
             cal.ano_mes,
             trs.total_salario,
@@ -69,6 +74,7 @@ def _source():
             "performance_mes",
             "prc_prj_estilo_vida",
             orc.orcado_juros,
+            "prc_sangramento",
         )
     )
 
