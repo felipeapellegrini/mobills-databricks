@@ -1,5 +1,5 @@
 from pyspark import pipelines as dp
-from pyspark.sql.functions import col, when, sum, coalesce
+from pyspark.sql.functions import col, when, sum, coalesce, lit
 
 
 _TRANSACOES = "gold.transacoes"
