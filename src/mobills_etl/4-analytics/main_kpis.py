@@ -38,6 +38,7 @@ def _source():
         .agg(
             sum(when(col("agrupador") == "Estilo de Vida", col("saldo"))).alias("orcado_estilo_vida"),
             (sum("saldo").alias("total_orcamento")),
+            sum(when(col("subcategoria") == "Dividas caras"), col("saldo")).alias("orcado_juros"),
         )
         .groupBy("data_orcamento")
         .agg(sum("orcado_estilo_vida").alias("orcado_estilo_vida"), sum("total_orcamento").alias("total_orcamento"))
@@ -63,6 +64,7 @@ def _source():
             orc.total_orcamento,
             "performance_mes",
             "prc_prj_estilo_vida",
+            orc.orcado_juros,
         )
     )
 
