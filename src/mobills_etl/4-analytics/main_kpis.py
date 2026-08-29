@@ -1,5 +1,5 @@
 from pyspark import pipelines as dp
-from pyspark.sql.functions import col, when, sum
+from pyspark.sql.functions import col, when, sum, coalesce, lit
 
 
 _TRANSACOES = "gold.transacoes"
@@ -49,7 +49,8 @@ def _source():
         .join(orc.alias("orc"), cal.ano_mes == orc.data_orcamento, "left")
         .withColumn("performance_mes", trs.total_receitas - trs.total_despesas - orc.total_orcamento)
         .withColumn(
-            "prc_prj_estilo_vida", (col("total_estilo_de_vida") + col("orcado_estilo_vida")) / col("total_salario")
+            "prc_prj_estilo_vida",
+            (col("total_estilo_de_vida") + coalesce(col("orcado_estilo_vida"), lit(0))) / col("total_salario"),
         )
         .select(
             cal.ano_mes,
