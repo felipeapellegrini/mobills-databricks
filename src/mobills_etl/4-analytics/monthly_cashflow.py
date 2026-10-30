@@ -14,6 +14,7 @@ _TARGET = "analytics.monthly_cashflow"
 def _source():
     trs = (
         spark.read.table(_TRANSACOES)
+        .filter(~(col("conta").isin(["Vestuário", "Outros Habitação", "Outros Educação", "Budget"])))
         .groupBy(["ano_mes"])
         .agg(
             sum("valor").alias("total_transacoes"),
