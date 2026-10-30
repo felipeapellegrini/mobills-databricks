@@ -15,7 +15,21 @@ _TARGET = "analytics.daily_cashflow"
 def _source():
     trs = (
         spark.read.table(_TRANSACOES)
-        .filter(~(col("conta").isin(["Vestuário", "Outros Habitação", "Outros Educação", "Budget"])))
+        .filter(
+            ~(
+                col("conta").isin(
+                    [
+                        "Budget",
+                        "Aniversário filhos",
+                        "Mesada familia",
+                        "Farmácia e remédios",
+                        "Vestuário",
+                        "Outros habitação",
+                        "Outros educação",
+                    ]
+                )
+            )
+        )
         .groupBy(["data_transacao"])
         .agg(
             sum("valor").alias("total_transacoes"),
