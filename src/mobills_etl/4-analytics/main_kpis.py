@@ -18,6 +18,7 @@ def _source():
 
     trs = (
         spark.read.table(_TRANSACOES)
+        .filter(~(col("conta").isin(["Vestuário", "Outros Habitação", "Outros Educação", "Budget"])))
         .groupBy("ano_mes")
         .agg(
             sum(when(col("subcategoria") == "Salario", col("valor_abs"))).alias("total_salario"),
