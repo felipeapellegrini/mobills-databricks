@@ -12,7 +12,21 @@ def _source():
     return (
         spark.read.table(_TRANSACOES)
         .filter((col("ano_mes") >= "2026-01-01") & (col("natureza").isin(["Despesas", "Receitas"])))
-        .filter(~(col("conta").isin(["Vestuário", "Outros Habitação", "Outros Educação", "Budget"])))
+        .filter(
+            ~(
+                col("conta").isin(
+                    [
+                        "Budget",
+                        "Aniversário filhos",
+                        "Mesada familia",
+                        "Farmácia e remédios",
+                        "Vestuário",
+                        "Outros habitação",
+                        "Outros educação",
+                    ]
+                )
+            )
+        )
         .groupBy(["ano_mes", "natureza"])
         .agg(sum(col("valor_abs")).alias("valor_abs"))
         .withColumn("despesas", when(col("natureza") == "Despesas", col("valor_abs")).otherwise(lit(0)))
